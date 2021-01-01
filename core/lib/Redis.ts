@@ -11,7 +11,7 @@ export default  class Redis {
 
     static setOtp(key: string, value: string){
         let rs =  Redis.client.set(key, value);
-        let expiryTime = (1000*60) * 5;
+        let expiryTime = 120;
         Redis.client.expire(key,expiryTime);
         return rs;
     }

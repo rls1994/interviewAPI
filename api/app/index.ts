@@ -23,14 +23,18 @@ Router.use((req: Request, res: Response, next: NextFunction) => {
 import vendor from "./routes/vendor";
 import stateDistrict from "./routes/stateDistrict";
 import user from "./routes/user";
+import userV2 from "./routes/userV2";
+import userV3 from "./routes/userV3";
 import order from "./routes/order";
 
 
 /*************** App Main Routes ******************/
-Router.use("/vendor", vendor);
-Router.use("/state", stateDistrict);
+// Router.use("/vendor", vendor);
+// Router.use("/state", stateDistrict);
 Router.use("/user",user);
-Router.use("/order", order);
+Router.use("/user/v2",userV2);
+Router.use("/user/v3",userV3);
+// Router.use("/order", order);
 
 
 Router.use((req: Request, res: Response, next: NextFunction) => {

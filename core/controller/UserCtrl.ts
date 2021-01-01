@@ -33,7 +33,7 @@ class UserCtrl {
         data.image || null,
         data.area? data.area : null,
         data.address?data.address: null,
-        true
+        (data.isVerified == true || data.isVerified == false) ? data.isVerified :  false
     );
     const response = await UserMapper.save(dm);
     return response;
@@ -106,16 +106,70 @@ class UserCtrl {
 
     let userResponse = await UserCtrl.add(data);
     if(userResponse.length ==0 ) throw new OtherError("Something went wrong while Registration");
+    let otp = UserCtrl.otpGenerator();
+    // console.log("In User Ctrl Register Fun OTP: "+ otp);
+    let otpSaveRes = await UserCtrl.saveOtp(userPhone, otp);
+    if(otpSaveRes){
+       return {
+         userResponse,
+         otp
+       };
+    }
+    else{
+      throw new OtherError("Something went wrong while Registration")
+    }
+  }
+
+  static registerUserV2 = async(data: UserFilter) => {
+    if(!data.phone) throw new ValidationError("User Phone is Required");
+    let userPhone = UserCtrl.phoneValidator(data.phone);
+    data.phone = userPhone;
+    let userCheck = await UserCtrl.get({phone: userPhone});
+    if(userCheck.length>0) throw new ValidationError("User Already Exists with the Given Number");
+    data.isVerified = true;
+    let userResponse = await UserCtrl.add(data);
+    if(userResponse.length ==0 ) throw new OtherError("Something went wrong while Registration");
     // let otp = UserCtrl.otpGenerator();
     // console.log("In User Ctrl Register Fun OTP: "+ otp);
     // let otpSaveRes = await UserCtrl.saveOtp(userPhone, otp);
     // if(otpSaveRes){
-       return userResponse;
+    //   return {
+    //     userResponse,
+    //     otp
+    //   };
     // }
     // else{
     //   throw new OtherError("Something went wrong while Registration")
     // }
+
+    return userResponse;
   }
+
+  static registerUserV3 = async(data: UserFilter) => {
+    if(!data.phone) throw new ValidationError("User Phone is Required");
+    let userPhone = UserCtrl.phoneValidator(data.phone);
+    data.phone = userPhone;
+    let userCheck = await UserCtrl.get({phone: userPhone});
+    if(userCheck.length>0) throw new ValidationError("User Already Exists with the Given Number");
+    data.isVerified = true;
+    let userResponse = await UserCtrl.add(data);
+    if(userResponse.length ==0 ) throw new OtherError("Something went wrong while Registration");
+    // let otp = UserCtrl.otpGenerator();
+    // console.log("In User Ctrl Register Fun OTP: "+ otp);
+    // let otpSaveRes = await UserCtrl.saveOtp(userPhone, otp);
+    // if(otpSaveRes){
+    //   return {
+    //     userResponse,
+    //     otp
+    //   };
+    // }
+    // else{
+    //   throw new OtherError("Something went wrong while Registration")
+    // }
+
+    return userResponse;
+  }
+
 
   static generateOtp = async (userPhone: string) => {
     userPhone = UserCtrl.phoneValidator(userPhone);
@@ -163,11 +217,11 @@ class UserCtrl {
     if(!pwdRes) throw new ValidationError("Invalid Credentials");
 
 
-    if(user[0].getVerificationStatus() == false)
-      return {
-        token: null,
-        user: user[0]
-      };
+    if(user[0].getVerificationStatus() == false) throw new OtherError("Account verification pending")
+      // return {
+      //   token: null,
+      //   user: user[0]
+      // };
 
     let token = AuthenticationToken.create({id: user[0].getId()!, phone: user[0].getPhone()});
 

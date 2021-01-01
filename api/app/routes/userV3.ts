@@ -1,5 +1,5 @@
 import express from "express";
-import { temp, login, register, update, changePassword, verify, forgotPassword, generateOtp } from "../handler/userHandler";
+import { temp, login, register, updateUser, registerUserV3, update, changePassword, verify, forgotPassword, generateOtp } from "../handler/userHandler";
 import { checkAuth } from "../middleware/chechAuth";
 
 
@@ -24,17 +24,17 @@ let upload = multer({ storage: storage })
 
 const router = express.Router();
 
-router.put("/", upload.single("image"), register);
+router.put("/", registerUserV3);
 
 router.post("/login", login);
 
-router.post("/verify", verify);
+// router.post("/verify", verify);
 
 // router.post("/forgotPassword", forgotPassword);
 
 // router.post("/generateOtp", generateOtp);
 
-router.patch("/", checkAuth, upload.single("image"), update);
+router.patch("/", checkAuth, updateUser);
 
 // router.patch("/changePassword", checkAuth, changePassword);
 

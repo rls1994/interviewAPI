@@ -20,9 +20,38 @@ export const temp = async (req: Request, res: Response, next: NextFunction) =>{
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if(!req.file) throw new ValidationError("Uer.Image is Required");
+        if(!req.file) throw new ValidationError("User.Image is Required");
         if(req.file) req.body.image = req.file.path;
         let data = await UserCtrl.register(req.body);
+        req.data = UserResponse.format(data.userResponse);
+        req.message = "Verification OTP: "+ data.otp
+        req.count = data.userResponse.length;
+        next();
+    }
+    catch (e) {
+        next(e)
+    }
+};
+
+export const registerUserV2 = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        if(!req.file) throw new ValidationError("User.Image is Required");
+        if(req.file) req.body.image = req.file.path;
+        let data = await UserCtrl.registerUserV2(req.body);
+        req.data = UserResponse.format(data);
+        req.count = data.length;
+        next();
+    }
+    catch (e) {
+        next(e)
+    }
+};
+
+
+export const registerUserV3 = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        req.body.image = null;
+        let data = await UserCtrl.registerUserV3(req.body);
         req.data = UserResponse.format(data);
         req.count = data.length;
         next();
@@ -95,6 +124,22 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 export const update = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if(req.file) req.body.image = req.file.path;
+        req.body.id = req.tokenInfo?.id;
+        req.body.phone = req.tokenInfo?.phone;
+        if(req.body.password) delete req.body.password;
+        let rs = await UserCtrl.update(req.body);
+        req.count = 1;
+        req.data = UserResponse.format(rs);
+        next()
+    }
+    catch (e) {
+        next(e)
+    }
+};
+
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
         req.body.id = req.tokenInfo?.id;
         req.body.phone = req.tokenInfo?.phone;
         if(req.body.password) delete req.body.password;

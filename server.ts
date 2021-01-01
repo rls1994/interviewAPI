@@ -48,7 +48,7 @@ app.initializeApp([
 ], [
     //routes
     { path: '/api/app', requestHandler: Api },
-    { path: '/api/web', requestHandler: WebApi },
+    // { path: '/api/web', requestHandler: WebApi },
 
     {path: '/uploads',requestHandler: express.static(__dirname + '/uploads')},
     // {path: '/*', requestHandler: function(req: Request, res: Response, next: NextFunction){

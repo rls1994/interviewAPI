@@ -4,8 +4,7 @@
     "description": "",
     "main": "server.js",
     "scripts": {
-        "start-server": "tsc && node build/server.js",
-        "start": "nodemon -s ts ./build -x npm run start-server"
+        "start": "tsc && node build/server.js"
     },
     "author": "Ramlal",
     "license": "ISC",
